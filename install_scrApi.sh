@@ -4,9 +4,20 @@
 # Este script instala Docker y Docker Compose, descarga el archivo docker-compose.yml,
 # y despliega los contenedores de OWASP crAPI en un entorno local.
 
+# Ruta del directorio de instalación (directorio actual)
+INSTALL_DIR="$(pwd)"
+
 # Función para verificar si un comando existe
 command_exists() {
     command -v "$1" &> /dev/null
+}
+
+# Verifica y ajusta permisos de escritura en el directorio
+check_permissions() {
+    if [ ! -w "$INSTALL_DIR" ]; then
+        echo "El directorio $INSTALL_DIR no tiene permisos de escritura. Ajustando permisos..."
+        sudo chmod u+w "$INSTALL_DIR" || { echo "Error: No se pudo ajustar los permisos."; exit 1; }
+    fi
 }
 
 # Instala Docker si no está instalado
@@ -45,6 +56,9 @@ if command_exists docker-compose; then
 else
     install_docker_compose
 fi
+
+# Verificar permisos del directorio
+check_permissions
 
 # Descargar archivo docker-compose.yml
 echo "Descargando archivo docker-compose.yml..."
